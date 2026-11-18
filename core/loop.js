@@ -34,6 +34,7 @@ import { buildSystem } from "./persona.js";
 import { declarations, runTool } from "./tools.js";
 import { addUsage } from "./trace.js";
 import { configuredModels, withModelFallback } from "../src/modelCascade.js";
+import { questionPolicy, sanitizeConversation } from "./policy.js";
 
 const MAX_STEPS = 5;
 const PREVIEW_CHARS = 400;
@@ -149,6 +150,14 @@ async function* runAgentForModel({ messages, key, model, thinking, signal, trace
 
 export async function* runAgent(options) {
   const { model, signal, trace } = options;
+  const policy = questionPolicy(options.messages);
+  if (policy) {
+    trace.answer = policy.text;
+    trace.status = "ok";
+    yield { type: "text", text: policy.text };
+    return;
+  }
+  const safeMessages = sanitizeConversation(options.messages);
   const models = configuredModels(model, options.fallbackModels ?? []);
   const result = await withModelFallback(models, async (candidate) => {
     const attemptTrace = {
@@ -163,7 +172,7 @@ export async function* runAgent(options) {
       usage: {},
     };
     const events = [];
-    for await (const event of runAgentForModel({ ...options, model: candidate, trace: attemptTrace })) {
+    for await (const event of runAgentForModel({ ...options, messages: safeMessages, model: candidate, trace: attemptTrace })) {
       events.push(event);
     }
     return { trace: attemptTrace, events };
