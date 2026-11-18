@@ -1,0 +1,30 @@
+name = "melwin-portfolio"
+main = "worker/index.js"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[vars]
+DAILY_CAP = "300"
+LANGSMITH_ENDPOINT = "https://api.smith.langchain.com"
+LANGSMITH_AGENT_ID = "terminal-agent"
+LANGSMITH_AGENT_ENVIRONMENT = "local"
+LANGSMITH_PROJECT = "terminal-agent-local"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "melwin-portfolio"
+database_id = "fe2ffbe7-7a29-49e6-9cef-4fff521ba9f2"
+
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 8
+  period = 60
+
+[triggers]
+crons = ["0 3 * * *"]
