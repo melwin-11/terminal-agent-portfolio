@@ -15,7 +15,7 @@ npx wrangler secret put GEMINI_API_KEY
 npx wrangler secret put LANGSMITH_API_KEY
 ```
 
-The Worker reads `LANGSMITH_ENDPOINT`, `LANGSMITH_AGENT_ID`, and `LANGSMITH_AGENT_ENVIRONMENT` from `wrangler.toml`. LangSmith tracing also needs `LANGSMITH_TRACING=true` if the integration expects the SDK's tracing toggle; set it as a Worker variable if needed. Keep the LangSmith project aligned with the intended environment.
+The Worker reads `LANGSMITH_ENDPOINT`, `LANGSMITH_AGENT_ID`, and `LANGSMITH_AGENT_ENVIRONMENT` from `wrangler.toml`. Hosted tracing is enabled when `LANGSMITH_API_KEY` is present; the Worker does not require a separate `LANGSMITH_TRACING` variable. For the local CLI, tracing runs when `LANGSMITH_API_KEY` is present and is disabled only when `LANGSMITH_TRACING=false`. Keep the LangSmith project aligned with the intended environment.
 
 ## 3. Initialize storage and deploy
 
