@@ -38,26 +38,6 @@ export const providers = {
       return u ? { input: u.promptTokenCount, output: u.candidatesTokenCount, thinking: u.thoughtsTokenCount } : null;
     },
   },
-
-  anthropic: {
-    keyEnv: "ANTHROPIC_API_KEY",
-    request({ model, system, messages, key }) {
-      return {
-        url: "https://api.anthropic.com/v1/messages",
-        headers: { "x-api-key": key, "anthropic-version": "2023-06-01" },
-        body: { model, max_tokens: 700, system, stream: true, messages },
-      };
-    },
-    text(data) {
-      if (data.type === "error") throw new Error(data.error?.message || "The model reported an error.");
-      return data.type === "content_block_delta" && data.delta?.type === "text_delta" ? data.delta.text : "";
-    },
-    usage(data) {
-      if (data.type === "message_start") return { input: data.message?.usage?.input_tokens };
-      if (data.type === "message_delta") return { output: data.usage?.output_tokens };
-      return null;
-    },
-  },
 };
 
 export function providerFor(name) {
@@ -98,10 +78,3 @@ export async function* sseData(body) {
   if (last) yield last;
 }
 
-export async function* sseTexts(body, textOf, onData) {
-  for await (const data of sseData(body)) {
-    onData?.(data);
-    const piece = textOf(data);
-    if (piece) yield piece;
-  }
-}

@@ -29,12 +29,11 @@
  * Terminal.app and most Linux terminals. Esc or ctrl+c interrupts a reply.
  *
  * Environment:
- *   GEMINI_API_KEY      call Gemini directly (development); use ANTHROPIC_API_KEY
- *                       instead when profile.provider is "anthropic"
+ *   GEMINI_API_KEY      call Gemini directly (development)
  *   PORTFOLIO_TRANSPORT choose "hosted" (default), "local", or "auto"
  *   PORTFOLIO_API_URL   override the hosted proxy endpoint
  *   PORTFOLIO_MODEL     override the model in direct mode
- *   PORTFOLIO_TIMEOUT_MS  optional; limit in milliseconds for each model call (default 45000)
+ *   PORTFOLIO_TIMEOUT_MS  optional; limit in milliseconds for each model call (default 15000)
  *   GITHUB_TOKEN        optional; raises GitHub's rate limit for live repository lookups
  *   PORTFOLIO_PRIVATE   set to 1 to ask the hosted agent not to store your question text
  */
