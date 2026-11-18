@@ -38,6 +38,14 @@ The D1 initialization command targets the remote database. Skip it when the exis
 
 Use `npm run ping` to check direct Gemini API connectivity independently of the hosted agent. It does not verify Worker deployment or LangSmith tracing.
 
+Run `npm test` for the deterministic topic and prompt-injection policy checks before deploying.
+
+## Request-limit behavior
+
+`wrangler.toml` configures the Worker Rate Limiting binding for 8 requests per IP per 60 seconds. Cloudflare's Worker rate-limit binding is approximate and can allow bursts over the configured threshold; it is not a hard spend cap. The 300-per-day cap reads today's D1 trace count before calling Gemini, so it is also a soft cap under concurrent requests or D1 failures. Review Cloudflare logs and billing if usage needs a strict ceiling. A strict global limit would need a coordinated counter such as a Durable Object, which adds operational cost and should be chosen deliberately.
+
+Malformed requests are rejected before model invocation and do not create traces. When smoke-testing rate limits, use invalid request bodies, inspect HTTP statuses, and remember that one burst may not reliably produce a 429 because the binding is approximate.
+
 ## GitHub and deployment boundary
 
 The public Git repository intentionally omits `knowledge/knowledge.js` and local secrets. Do not use `git add -f` on ignored personal data. For local deployments, keep the private file in the working tree. For future GitHub Actions deployments, inject the file from a suitably protected secret or private artifact at build time; never commit it to the public repository.
