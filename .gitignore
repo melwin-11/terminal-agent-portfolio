@@ -1,0 +1,13 @@
+node_modules/
+.traces/
+.wrangler/
+
+# Keep Melwin's personal knowledge base out of the public repository.
+knowledge/knowledge.js
+
+# Local credentials and Cloudflare development secrets.
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*

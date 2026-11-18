@@ -1,0 +1,30 @@
+{
+  "name": "melwin-portfolio",
+  "version": "1.0.0",
+  "description": "A terminal portfolio where recruiters ask an AI agent about me",
+  "type": "module",
+  "bin": {
+    "melwin-portfolio": "./src/main.js"
+  },
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/main.js",
+    "deploy": "npx wrangler deploy",
+    "report": "node scripts/report.mjs",
+    "trace": "node scripts/trace.mjs",
+    "db:init": "npx wrangler d1 execute melwin-portfolio --remote --file=worker/schema.sql",
+    "ping": "node scripts/ping.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "langsmith": "^0.13.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.164.0"
+  }
+}
