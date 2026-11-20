@@ -54,12 +54,5 @@ The current automated evaluation coverage is a small Node test suite for scope f
 
 The orchestration currently uses a custom JavaScript loop with Gemini's native function-calling API. LangSmith is integrated for tracing. LangChain and LangGraph are not dependencies in the current codebase, so this project does not claim to use their chains, retrievers, or graph runtime.
 
-## Get in touch
-
-- Email: [melwin.11.robinson@gmail.com](mailto:melwin.11.robinson@gmail.com)
-- GitHub: [github.com/melwin-11](https://github.com/melwin-11)
-- LinkedIn: [linkedin.com/in/melwin-robinson](https://www.linkedin.com/in/melwin-robinson)
-
-## License
 
 MIT. See [LICENSE](LICENSE).
