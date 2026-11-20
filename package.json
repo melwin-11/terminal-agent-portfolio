@@ -18,7 +18,8 @@
     "report": "node scripts/report.mjs",
     "trace": "node scripts/trace.mjs",
     "db:init": "npx wrangler d1 execute melwin-portfolio --remote --file=worker/schema.sql",
-    "ping": "node scripts/ping.mjs"
+    "ping": "node scripts/ping.mjs",
+    "test": "node --test"
   },
   "license": "MIT",
   "dependencies": {
