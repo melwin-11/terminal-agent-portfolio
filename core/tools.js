@@ -10,25 +10,15 @@
  *   get_projects        projects, filterable by keyword
  *   get_research        curated research work, filterable by keyword
  *   get_skills          skills grouped by category
+ *   get_certifications  credentials and training
  *   get_links           website, LinkedIn, GitHub, ORCID, email
  *   get_live_activity   live: latest GitHub repositories and ORCID publications
  *
- * The descriptions are the part that decides whether the model picks the right
- * tool, so tune them against live questions and npm run trace. A good description
- * says what the tool returns and when to use it, and names what it is not for.
- *
- * Keyword filters score each entry by how many query words appear anywhere in
- * it; when nothing matches the tool returns the available names so the model can
- * retry. Lists are returned newest first, with ongoing entries (end: null) on top.
- *
- * Live sources are cached in memory for one hour. GitHub allows 60 anonymous
- * requests per hour per address, which a shared address such as the Worker's can
- * exhaust, so setToolConfig({ githubToken }) raises the limit when a token is
- * provided. ORCID's public API needs no key. A failing
- * source returns an error object instead of throwing, so the model can say the
- * source is unavailable. Runs in Node and in the Worker.
+ * Tool descriptions guide model selection. Keyword filters score each entry
+ * by matching query words. Live sources are cached for one hour; failing sources
+ * return an error object instead of throwing. Runs in Node and in the Worker.
  */
-import { links, experience, education, projects, research, skills } from "../knowledge/knowledge.js";
+import { links, experience, education, projects, research, skills, certifications } from "../knowledge/knowledge.js";
 
 const CACHE_MS = 60 * 60 * 1000;
 const cache = new Map();
@@ -179,6 +169,14 @@ export const tools = [
       "Technical and soft skills grouped by category: programming languages, developer tools, libraries and frameworks, cloud and DevOps. Use for questions about skills, technologies or what the owner is proficient in.",
     run: () => ({ count: Object.keys(skills).length, skills }),
     summarize: (r) => `${r.count} ${r.count === 1 ? "category" : "categories"}`,
+  },
+  {
+    name: "get_certifications",
+    description:
+      "Certificates, certifications, training badges, and credentials, including which ones are in progress. Use for questions about certifications, credentials, badges, or completed professional training.",
+    parameters: queryParam("certifications and credentials"),
+    run: ({ query }) => find(certifications, query, (e) => e.name),
+    summarize: (r) => plural(r.count, "credential"),
   },
   {
     name: "get_links",
