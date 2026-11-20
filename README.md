@@ -2,6 +2,12 @@
 
 A terminal portfolio agent that answers questions about Melwin Robinson's experience, projects, research, skills, and public links. It uses Gemini for responses and can run locally or through a Cloudflare Worker. LangSmith tracing is configured for the hosted agent.
 
+## Demo
+
+Watch the [terminal agent demo](https://github.com/user-attachments/assets/979328ac-dc4d-49d2-a78e-ee8c8af4d189):
+
+https://github.com/user-attachments/assets/979328ac-dc4d-49d2-a78e-ee8c8af4d189
+
 ## Requirements
 
 - Node.js 18 or newer
