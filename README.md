@@ -4,7 +4,7 @@ A conversational portfolio experience for exploring Melwin's engineering work, p
 
 ## Watch the demo
 
-https://github.com/user-attachments/assets/979328ac-dc4d-49d2-a78e-ee8c8af4d189
+https://github.com/user-attachments/assets/c60c52de-47c8-4cc4-8af8-1808be4f8e9e
 
 ## What you can ask
 
