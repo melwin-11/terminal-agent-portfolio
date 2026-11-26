@@ -19,7 +19,9 @@ https://github.com/user-attachments/assets/c60c52de-47c8-4cc4-8af8-1808be4f8e9e
 The diagram below illustrates the agent's question-to-answer flow, safeguards, retrieval, model reasoning, tracing, deployment, and improvement cycle.
 
 <p align="center">
-  <img width="1358" height="655" alt="Architecture diagram showing the terminal portfolio agent's end-to-end flow" src="https://github.com/user-attachments/assets/989e85ea-2104-438f-b249-01f10b1dfdf7" />
+  <a href="https://github.com/user-attachments/assets/a3059eb0-b2b2-4466-9e2a-92ac3168e1b2">
+    <img src="https://github.com/user-attachments/assets/a3059eb0-b2b2-4466-9e2a-92ac3168e1b2" width="100%" alt="Architecture diagram showing the terminal portfolio agent's end-to-end flow">
+  </a>
 </p>
 
 ## Agent engineering
