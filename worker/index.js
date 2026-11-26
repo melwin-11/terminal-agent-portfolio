@@ -1,11 +1,10 @@
 import { profile } from "../src/profile.js";
 import { providerFor } from "../src/providers.js";
-import { runAgent } from "../core/loop.js";
 import { newTrace } from "../core/trace.js";
-import { setToolConfig } from "../core/tools.js";
 import { Client } from "langsmith";
 import { traceable } from "langsmith/traceable";
 import { record, dailyCount, recent, purge } from "./trace.js";
+import { shouldTraceGeneration } from "./privacy.js";
 
 const MAX_TURNS = 12;
 const MAX_CHARS = 1000;
@@ -41,8 +40,8 @@ async function same(a, b) {
   return diff === 0;
 }
 
-async function tracedGeneration(env, messages, generate) {
-  if (!env.LANGSMITH_API_KEY) return generate();
+export async function tracedGeneration(env, messages, generate, privateMode = false) {
+  if (!shouldTraceGeneration(env.LANGSMITH_API_KEY, privateMode)) return generate();
 
   const agentId = env.LANGSMITH_AGENT_ID || "terminal-agent";
   const environment = env.LANGSMITH_AGENT_ENVIRONMENT || "production";
@@ -100,8 +99,9 @@ async function tracedGeneration(env, messages, generate) {
   }
 }
 
-async function visitorId(ip, env) {
-  const digest = await sha256(`${env.HASH_SALT ?? "unsalted"}:${ip}`);
+export async function visitorId(ip, env) {
+  if (!env.HASH_SALT) return null;
+  const digest = await sha256(`${env.HASH_SALT}:${ip}`);
   return [...digest.slice(0, 8)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
@@ -165,6 +165,10 @@ async function chat(request, env, ctx) {
     const generate = async (modelMessages = messages) => {
       const agentTrace = newTrace(messages.at(-1).content, model);
       const events = [];
+      const [{ runAgent }, { setToolConfig }] = await Promise.all([
+        import("../core/loop.js"),
+        import("../core/tools.js"),
+      ]);
       setToolConfig({ githubToken: env.GITHUB_TOKEN });
       try {
         for await (const event of runAgent({
@@ -194,7 +198,7 @@ async function chat(request, env, ctx) {
         tools: agentTrace.tools,
       };
     };
-    selected = await tracedGeneration(env, messages, generate);
+    selected = await tracedGeneration(env, messages, generate, trace.private);
     trace.model = selected.model;
     trace.usage = selected.usage;
     trace.ttft = selected.first;

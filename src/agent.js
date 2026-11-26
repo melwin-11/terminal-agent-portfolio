@@ -22,8 +22,8 @@
  *
  * session is a random id created once per run so the proxy can group the turns
  * of one conversation; it is not stored on disk. Setting PORTFOLIO_PRIVATE=1
- * adds the x-portfolio-private header, which tells the proxy to record timing
- * only and never the question or answer text.
+ * adds the x-portfolio-private header, which tells the proxy to omit question
+ * and answer text from saved traces while retaining operational metadata.
  *
  * Tool calling is implemented for the gemini provider only.
  */
@@ -31,6 +31,7 @@ import { randomUUID } from "node:crypto";
 import { profile } from "./profile.js";
 import { providerFor, sseData } from "./providers.js";
 import { traceAgent } from "./langsmithTracing.js";
+import { isPrivateMode, shouldPersistConversation } from "./privacy.js";
 
 export const sessionId = randomUUID();
 
@@ -59,7 +60,8 @@ async function* direct(messages, signal, key) {
   core.setToolConfig({ githubToken: process.env.GITHUB_TOKEN });
   const model = process.env.PORTFOLIO_MODEL || profile.model;
   const question = messages.at(-1).content;
-  const result = await traceAgent(question, async () => {
+  const privateMode = isPrivateMode();
+  const run = async () => {
     const trace = core.newTrace(question, model);
     const events = [];
     try {
@@ -89,9 +91,10 @@ async function* direct(messages, signal, key) {
       throw err;
     } finally {
       trace.total = Date.now() - trace.ts;
-      core.writeLocalTrace(trace);
+      if (shouldPersistConversation(privateMode)) core.writeLocalTrace(trace);
     }
-  });
+  };
+  const result = privateMode ? await run() : await traceAgent(question, run);
   for (const event of result.events) yield event;
 }
 
@@ -100,7 +103,7 @@ async function* hosted(messages, signal) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      ...(process.env.PORTFOLIO_PRIVATE === "1" ? { "x-portfolio-private": "1" } : {}),
+      ...(isPrivateMode() ? { "x-portfolio-private": "1" } : {}),
     },
     body: JSON.stringify({ messages, session: sessionId, client: profile.version }),
     signal,

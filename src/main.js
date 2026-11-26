@@ -35,7 +35,7 @@
  *   PORTFOLIO_MODEL     override the model in direct mode
  *   PORTFOLIO_TIMEOUT_MS  optional; limit in milliseconds for each model call (default 15000)
  *   GITHUB_TOKEN        optional; raises GitHub's rate limit for live repository lookups
- *   PORTFOLIO_PRIVATE   set to 1 to ask the hosted agent not to store your question text
+ *   PORTFOLIO_PRIVATE   set to 1 to omit question and answer text from saved traces
  */
 import { profile } from "./profile.js";
 import { streamReply, isHosted } from "./agent.js";
@@ -58,7 +58,7 @@ const FRAMES = ["·", "✢", "✶", "✻", "✽", "✻", "✶", "✢"];
 const VERBS = ["Pondering", "Cogitating", "Noodling", "Ruminating", "Percolating", "Consulting the résumé"];
 const KEY = /\x1b\[[0-9;?]*[A-Za-z~]|\x1bO[A-Z]|\x1b|\r\n|[\s\S]/gu;
 
-const PRIVACY_NOTE = "Questions are logged to improve this agent. Type /privacy for details.";
+const PRIVACY_NOTE = "Hosted mode saves question and answer text in D1; LangSmith traces them when configured. Set PORTFOLIO_PRIVATE=1 to omit the text. Type /privacy for details.";
 
 const out = (s) => process.stdout.write(s);
 const cols = () => process.stdout.columns || 80;
@@ -158,7 +158,10 @@ function banner() {
 }
 
 function showWelcome() {
-  const note = isHosted() ? `\n  ${paint(S.dim, profile.privacyNote ?? PRIVACY_NOTE)}` : "";
+  const privacyNote = isHosted()
+    ? profile.privacyNote ?? PRIVACY_NOTE
+    : "Local mode saves question and answer traces in .traces/. Set PORTFOLIO_PRIVATE=1 to skip local and LangSmith traces.";
+  const note = `\n  ${paint(S.dim, privacyNote)}`;
   out(`\n${banner().join("\n")}\n\n  ${paint(S.dim, profile.hint)}${note}\n\n`);
 }
 
@@ -253,18 +256,22 @@ function showContact() {
 }
 
 function showPrivacy() {
-  if (!isHosted()) {
-    hook([paint(S.dim, "Running with a local API key: this app stores nothing.")]);
-    return;
-  }
+  const hosted = isHosted();
   hook(
-    [
-      "Logged: your questions, the answers, timing and your country.",
-      "Not stored: your IP address, only a salted hash to spot abuse.",
-      `Deleted automatically after ${profile.retentionDays ?? 90} days.`,
-      "Opt out: set PORTFOLIO_PRIVATE=1 and only timing is recorded.",
-      "Requests also pass through Cloudflare and Google as usual.",
-    ].map((line) => paint(S.dim, line)),
+    (hosted
+      ? [
+          "Hosted mode sends your conversation to Cloudflare and Google to generate an answer.",
+          "By default, question and answer text are saved in Cloudflare D1, sent to LangSmith when configured, and sent to Langfuse if configured.",
+          "Set PORTFOLIO_PRIVATE=1 to omit question and answer text from Cloudflare D1, LangSmith, and Langfuse traces; timing, model, token counts, country, and an optional salted visitor hash remain.",
+          "A salted visitor hash is stored only when HASH_SALT is configured; the raw IP is not written by this app.",
+          `Cloudflare D1 trace rows are deleted after ${profile.retentionDays ?? 90} days. LangSmith and Langfuse follow their workspace retention settings.`,
+        ]
+      : [
+          "Local mode sends your question to Google to generate an answer.",
+          "By default, local traces including question and answer text are saved in .traces/traces.jsonl and sent to LangSmith if configured.",
+          "Set PORTFOLIO_PRIVATE=1 to skip local trace files and LangSmith tracing.",
+        ]
+    ).map((line) => paint(S.dim, line)),
   );
 }
 

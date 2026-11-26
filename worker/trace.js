@@ -1,3 +1,5 @@
+import { redactTraceContent } from "./privacy.js";
+
 export const UNANSWERED =
   /\b(?:do not|don't|does not|doesn't) have (?:that |this |any |enough |specific )?(?:information|details|data)\b/i;
 
@@ -73,13 +75,9 @@ async function sendLangfuse(env, r) {
 }
 
 export async function record(env, trace) {
+  const row = redactTraceContent(trace);
   const keep = !trace.private;
-  const row = {
-    ...trace,
-    question: keep ? trace.question : null,
-    answer: keep ? trace.answer : null,
-    unanswered: keep && UNANSWERED.test(trace.answer) ? 1 : 0,
-  };
+  row.unanswered = keep && UNANSWERED.test(trace.answer) ? 1 : 0;
   console.log(
     JSON.stringify({
       evt: "chat", id: row.id, status: row.status, ttft: row.ttft, total: row.total,

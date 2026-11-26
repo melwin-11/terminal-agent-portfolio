@@ -18,7 +18,7 @@ The install adds the package to the current project; `npx` runs its CLI without 
 - What AI Engineer or Software Engineer roles is he looking for?
 - How did he build and deploy this portfolio agent?
 
-Use `/about`, `/experience`, `/projects`, or `/skills` for quick prompts; `/contact` shows ways to reach me, `/privacy` explains what gets logged, and `/exit` quits. You can also press Ctrl+C to exit.
+Use `/about`, `/experience`, `/projects`, or `/skills` for quick prompts; `/contact` shows ways to reach me, `/privacy` explains what gets logged, and `/exit` quits. By default, hosted runs save question and answer text in D1 and send it to LangSmith when tracing is configured. Set `PORTFOLIO_PRIVATE=1` before launch to omit conversation text from saved traces; operational metadata is still recorded. You can also press Ctrl+C to exit.
 
 ## Watch my demo
 
