@@ -7,7 +7,7 @@ const INJECTION_PATTERNS = [
 ];
 
 const PROFILE_TOPIC =
-  /\b(?:melwin|robinson|profile|resume|résumé|cv|background|experience|internship|education|degree|university|school|skills?|certifications?|certificates?|credentials?|badges?|aws|sap|oracle|cisco|anthropic|claude|projects?|research|papers?|publications?|career|roles?|jobs?|hiring|recruit|availability|mentor(?:ship)?|contact|email|github|linkedin|orcid|portfolio|achievements?|gpa|what does he do|what is he working on|what are you working on|tell me about yourself|who are you|are you an ai|are you a bot)\b/i;
+  /\b(?:melwin|robinson|profile|resume|résumé|cv|background|experience|internship|education|degree|university|school|skills?|certifications?|certificates?|credentials?|badges?|aws|sap|oracle|cisco|anthropic|claude|projects?|research|papers?|publications?|career|roles?|jobs?|hiring|recruit|open to work|available|availability|notice period|immediate joiner|mentor(?:ship)?|contact|email|github|linkedin|orcid|portfolio|achievements?|gpa|what does he do|what is he working on|what are you working on|tell me about yourself|who are you|are you an ai|are you a bot)\b/i;
 
 const REDIRECT =
   "I can help with questions about Melwin Robinson's professional profile, experience, projects, research, skills, education, or roles. What would you like to know?";
