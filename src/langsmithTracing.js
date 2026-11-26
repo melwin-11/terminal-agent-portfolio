@@ -1,5 +1,7 @@
+import { isPrivateMode } from "./privacy.js";
+
 export async function traceAgent(question, run) {
-  if (!process.env.LANGSMITH_API_KEY || process.env.LANGSMITH_TRACING === "false") {
+  if (!process.env.LANGSMITH_API_KEY || process.env.LANGSMITH_TRACING === "false" || isPrivateMode()) {
     return run();
   }
 

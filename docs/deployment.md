@@ -15,7 +15,9 @@ npx wrangler secret put GEMINI_API_KEY
 npx wrangler secret put LANGSMITH_API_KEY
 ```
 
-The Worker reads `LANGSMITH_ENDPOINT`, `LANGSMITH_AGENT_ID`, and `LANGSMITH_AGENT_ENVIRONMENT` from `wrangler.toml`. Hosted tracing is enabled when `LANGSMITH_API_KEY` is present; the Worker does not require a separate `LANGSMITH_TRACING` variable. For the local CLI, tracing runs when `LANGSMITH_API_KEY` is present and is disabled only when `LANGSMITH_TRACING=false`. Keep the LangSmith project aligned with the intended environment.
+Optionally set `HASH_SALT` as a Worker secret to enable pseudonymous visitor grouping. Without it, the Worker does not store a visitor hash.
+
+The Worker reads `LANGSMITH_ENDPOINT`, `LANGSMITH_AGENT_ID`, and `LANGSMITH_AGENT_ENVIRONMENT` from `wrangler.toml`. Hosted tracing is enabled when `LANGSMITH_API_KEY` is present; the Worker does not require a separate `LANGSMITH_TRACING` variable. For the local CLI, tracing runs when `LANGSMITH_API_KEY` is present and is disabled when `LANGSMITH_TRACING=false` or `PORTFOLIO_PRIVATE=1`. Private hosted requests skip LangSmith and Langfuse text traces and redact text in D1; operational metadata is still recorded. `HASH_SALT` is optional; without it, the Worker omits the visitor hash. LangSmith traces use the `terminal-agent-production` project.
 
 ## 3. Initialize storage and deploy
 
