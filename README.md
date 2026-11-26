@@ -4,7 +4,7 @@ I built this conversational portfolio agent to give recruiters a practical way t
 
 ## Watch my demo
 
-https://github.com/user-attachments/assets/979328ac-dc4d-49d2-a78e-ee8c8af4d189
+https://github.com/user-attachments/assets/c60c52de-47c8-4cc4-8af8-1808be4f8e9e
 
 ## Questions you can ask me
 
@@ -19,7 +19,9 @@ https://github.com/user-attachments/assets/979328ac-dc4d-49d2-a78e-ee8c8af4d189
 The diagram below shows the flow I designed, from a recruiter's question through safeguards, profile retrieval, model reasoning, tracing, deployment, and iteration.
 
 <p align="center">
-  <img width="1358" height="655" alt="Architecture diagram showing the end-to-end flow of my terminal portfolio agent" src="https://github.com/user-attachments/assets/41291718-ffd6-4bc7-a33f-ff395ca5f519" />
+  <a href="https://github.com/user-attachments/assets/a3059eb0-b2b2-4466-9e2a-92ac3168e1b2">
+    <img src="https://github.com/user-attachments/assets/a3059eb0-b2b2-4466-9e2a-92ac3168e1b2" width="100%" alt="Architecture diagram showing the terminal portfolio agent's end-to-end flow">
+  </a>
 </p>
 
 ### Agent orchestration and tool calling
