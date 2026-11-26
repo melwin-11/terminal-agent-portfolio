@@ -1,22 +1,22 @@
-# Melwin Robinson — Terminal Portfolio Agent
+# My Terminal Portfolio Agent
 
-A conversational portfolio experience for exploring Melwin's engineering work, projects, research, skills, and career interests. The agent uses Gemini, guarded profile tools, Cloudflare Workers, and LangSmith tracing.
+I built this conversational portfolio agent to give recruiters a practical way to explore my engineering work, projects, research, skills, and career interests. It uses Gemini for language reasoning, profile tools to retrieve relevant facts, Cloudflare Workers for the hosted service, and LangSmith to trace hosted runs.
 
-## Watch the demo
+## Watch my demo
 
 https://github.com/user-attachments/assets/c60c52de-47c8-4cc4-8af8-1808be4f8e9e
 
-## What you can ask
+## Questions you can ask me
 
-- What projects has Melwin built, and what technologies did he use?
-- What is his experience with AI engineering and software development?
-- What research has he published or presented, and what is he exploring next?
-- What roles and research opportunities is he interested in?
-- What is he currently building, and what has he learned from it?
+- What projects have I built, and which technologies did I use?
+- What experience do I have in AI engineering and software development?
+- What research have I published or presented, and what topics am I exploring?
+- Which roles and research opportunities am I looking for?
+- What am I currently building, and what have I learned from it?
 
-## Architecture
+## How my agent works
 
-The diagram below illustrates the agent's question-to-answer flow, safeguards, retrieval, model reasoning, tracing, deployment, and improvement cycle.
+The diagram below shows the flow I designed, from a recruiter's question through safeguards, profile retrieval, model reasoning, tracing, deployment, and iteration.
 
 <p align="center">
   <a href="https://github.com/user-attachments/assets/a3059eb0-b2b2-4466-9e2a-92ac3168e1b2">
@@ -24,37 +24,42 @@ The diagram below illustrates the agent's question-to-answer flow, safeguards, r
   </a>
 </p>
 
-## Agent engineering
-
 ### Agent orchestration and tool calling
 
-The portfolio assistant is a single tool-using agent. A custom JavaScript orchestration loop sends the conversation, system instructions, and Gemini function declarations to the model. When Gemini requests a function, the loop validates the tool name against an allowlist, executes that read-only profile tool, returns its result to the model, and continues until it can produce a final answer. A turn is capped at five model/tool steps to prevent an open-ended tool cycle.
+I built a single tool-using agent around a custom JavaScript orchestration loop. For each turn, I send Gemini the conversation, my system instructions, and function declarations that describe the tools the agent can use. When Gemini requests a function, my loop dispatches the call to an approved read-only profile tool, sends the result back to the model, and continues until it produces an answer. I cap a turn at five model/tool steps to prevent an open-ended tool cycle.
 
-The tools cover experience, education, projects, research, skills, certifications, public links, and selected live GitHub/ORCID activity. Their descriptions and JSON parameter schemas tell the model when each tool is appropriate. Tool calls, elapsed time, success/failure, and concise result previews are captured in the agent trace.
+I provide tools for experience, education, projects, research, skills, certifications, public links, and selected live GitHub and ORCID activity. Each tool has a description and JSON parameter schema to help Gemini choose it for the question. I record tool names, arguments, duration, success or failure, and a concise result preview in the trace.
 
-### Grounded profile retrieval
+### Grounded retrieval from my profile data
 
-The source of truth is a curated, structured profile knowledge base maintained separately from the public repository. Profile tools retrieve matching entries by scoring keyword overlap; if a query matches nothing, the tool can return available entry names so the model can retry with a broader query. Public GitHub repository and ORCID publication lookups are available for live activity and cached in memory for one hour.
+I maintain a curated, structured profile knowledge base as the factual source for the agent. The profile tools score records by keyword overlap and return the best matching entries. When nothing matches, a tool can return available entry names so the model can retry with a broader query. For recent public activity, I also query GitHub and ORCID; those results are cached in memory for one hour.
 
-This implementation does not currently ingest a resume into chunks or use embeddings/vector search. Retrieval is deterministic keyword matching over curated profile records, with selected live-source lookups. The profile knowledge is factual context for responses, not a model-training dataset.
+My current retrieval is keyword-based over curated profile records, plus selected live-source lookups. I have not implemented resume chunking, embeddings, or vector search. This profile knowledge is a source of facts for answers, not a model-training dataset.
 
-### System prompt and AI security
+### System prompt, guardrails, and AI security
 
-The system prompt establishes the agent's recruiter-facing role, limits its scope to Melwin's professional profile, directs it to retrieve facts through approved tools, and tells it not to invent missing details. It also treats user messages and retrieved tool results as untrusted data, so text inside a profile entry or public-source result cannot change the agent's instructions. The agent only has read-only profile tools and is not given arbitrary browsing or write actions.
+I designed the system prompt to define the agent's recruiter-facing role and keep it focused on my professional profile. It instructs the model to retrieve profile facts through approved tools, avoid inventing information, treat user messages and retrieved content as untrusted data, and keep private instructions and credentials confidential. The agent has read-only profile tools; it cannot browse arbitrary user-supplied URLs or change data.
 
-There are additional checks before model invocation: a topic gate redirects unrelated requests, and pattern-based injection checks refuse common attempts to override instructions or extract prompts, credentials, private data, or internal traces. Earlier matching injection text in the conversation is replaced with a neutral marker before the remaining conversation is sent to Gemini. These are layered safeguards against common attacks, not a guarantee against every prompt-injection technique.
+I added checks before model generation: a topic gate redirects unrelated questions, while pattern-based prompt-injection checks refuse common attempts to override instructions or extract prompts, credentials, private data, or internal traces. If an earlier message contains a matching injection pattern, I replace that text with a neutral marker before sending the rest of the conversation to Gemini. These controls provide layered protection against common attacks, but they cannot guarantee detection of every prompt-injection technique.
 
 ### Reliability, tracing, and evaluation
 
-Model selection follows the configured Gemini order. A timed-out request, rate limit, server error, or missing-model response can move the turn to the next configured model; after a transient failure, the failing model is temporarily cooled down to make subsequent turns fail over faster. A fallback restarts the turn from its original conversation, rather than mixing tool-call state between models.
+I configure Gemini models in priority order. If a request times out or returns a rate-limit, server, or missing-model error, the agent can retry the whole turn on the next configured model. After a transient failure, it temporarily cools down the failing model so later requests can fail over sooner. Restarting the full turn avoids carrying tool-call state between different models.
 
-Hosted runs are traced to LangSmith with agent/environment metadata. The trace includes the selected model, answer, latency and token usage, model steps, and tool-call details. The Worker also records operational trace rows in Cloudflare D1 and applies per-IP request limits and a daily request cap before generation.
+I integrated LangSmith tracing for hosted runs and attach agent and environment metadata. Traces capture the selected model, answer, latency, token usage, model steps, and tool-call details. The Worker also stores operational trace rows in Cloudflare D1 and applies per-IP request limits and a daily request cap before model generation.
 
-The current automated evaluation coverage is a small Node test suite for scope filtering, contextual follow-ups, and common prompt-injection handling. There is not yet a golden-question dataset, rubric-based answer scoring, or an LLM-as-judge evaluation pipeline; LangSmith traces provide material to curate and evaluate against as the knowledge base grows.
+My current automated checks cover request scope, contextual follow-ups, and common prompt-injection cases. I have not yet built a golden-question evaluation dataset, rubric-based answer scoring, or an LLM-as-judge pipeline. I can use reviewed traces to curate that evaluation set as the agent and my profile knowledge evolve.
 
-### Frameworks used
+### Framework choices
 
-The orchestration currently uses a custom JavaScript loop with Gemini's native function-calling API. LangSmith is integrated for tracing. LangChain and LangGraph are not dependencies in the current codebase, so this project does not claim to use their chains, retrievers, or graph runtime.
+I implemented orchestration with a custom JavaScript loop and Gemini's native function-calling API, and I use LangSmith for tracing. LangChain and LangGraph are not currently dependencies in this project, so I do not claim to use their chains, retrievers, or graph runtime.
 
+## Contact me
+
+- Email: [melwin.11.robinson@gmail.com](mailto:melwin.11.robinson@gmail.com)
+- GitHub: [github.com/melwin-11](https://github.com/melwin-11)
+- LinkedIn: [linkedin.com/in/melwin-robinson](https://www.linkedin.com/in/melwin-robinson)
+
+## License
 
 MIT. See [LICENSE](LICENSE).
