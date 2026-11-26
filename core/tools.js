@@ -122,6 +122,15 @@ async function orcidWorks(id) {
 }
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const RESEARCH_OVERVIEW_WORDS = new Set([
+  "all", "any", "every", "his", "her", "their", "my", "melwin", "robinson", "research", "work", "works",
+  "publication", "publications", "paper", "papers", "study", "studies", "academic", "scholarly", "list", "show",
+  "tell", "me", "about", "what", "are", "has", "have", "published", "presented", "the", "of", "and",
+]);
+const isResearchOverviewQuery = (query) => {
+  const words = String(query ?? "").toLowerCase().split(/[^a-z0-9+#.]+/).filter((w) => w.length > 1);
+  return words.length === 0 || words.every((word) => RESEARCH_OVERVIEW_WORDS.has(word));
+};
 const queryParam = (what) => ({
   type: "object",
   properties: {
@@ -158,9 +167,9 @@ export const tools = [
   {
     name: "get_research",
     description:
-      "Curated research work: papers, theses, preprints and ongoing studies with venue, status and summary. Use for questions about research or publications. For the live ORCID list use get_live_activity.",
+      "Curated research work: papers, conference presentations and book chapters with venue, status and summary. For broad questions asking about all research, publications, papers, or academic work, omit query to return the complete list. Use a query only for a specific topic or title. For the live ORCID list use get_live_activity.",
     parameters: queryParam("research"),
-    run: ({ query }) => find(research, query, (e) => e.title),
+    run: ({ query }) => find(research, isResearchOverviewQuery(query) ? "" : query, (e) => e.title),
     summarize: (r) => plural(r.count, "entry").replace("entrys", "entries"),
   },
   {

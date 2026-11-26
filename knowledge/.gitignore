@@ -1,0 +1,3 @@
+# Keep this folder local: it contains the private profile data loaded by the agent.
+*
+!.gitignore
