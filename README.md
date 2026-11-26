@@ -2,6 +2,24 @@
 
 I built this conversational portfolio agent to give recruiters a practical way to explore my engineering work, projects, research, skills, and career interests. It uses Gemini for language reasoning, profile tools to retrieve relevant facts, Cloudflare Workers for the hosted service, and LangSmith to trace hosted runs.
 
+## Try the agent
+
+Install the package with Node.js 18 or newer, then launch its terminal command. It uses my hosted Cloudflare Worker by default, so you do not need to provide a Gemini API key or clone the repository.
+
+```sh
+npm i melwin-portfolio
+npx melwin-portfolio
+```
+
+The install adds the package to the current project; `npx` runs its CLI without a global install. When the terminal opens, type a question and press Enter. You can ask about my experience, projects, research, education, skills, or the roles I am seeking. For example:
+
+- What has Melwin built, and what technologies did he use?
+- What research has he published or presented?
+- What AI Engineer or Software Engineer roles is he looking for?
+- How did he build and deploy this portfolio agent?
+
+Use `/about`, `/experience`, `/projects`, or `/skills` for quick prompts; `/contact` shows ways to reach me, `/privacy` explains what gets logged, and `/exit` quits. You can also press Ctrl+C to exit.
+
 ## Watch my demo
 
 https://github.com/user-attachments/assets/c60c52de-47c8-4cc4-8af8-1808be4f8e9e

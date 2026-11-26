@@ -1,10 +1,10 @@
 {
   "name": "melwin-portfolio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A terminal portfolio where recruiters ask an AI agent about me",
   "type": "module",
   "bin": {
-    "melwin-portfolio": "./src/main.js"
+  "melwin-portfolio": "src/main.js"
   },
   "files": [
     "src"
